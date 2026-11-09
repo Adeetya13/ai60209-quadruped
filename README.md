@@ -16,8 +16,10 @@ locomotion task.
 | Random policy | `eval/evaluate.py --policy random` | the floor |
 
 **Environment:** Gymnasium `Ant-v5`, a four-legged MuJoCo robot.
-27-dimensional observation, 8-dimensional continuous action (two joints per
-leg), episodes capped at 1000 steps.
+105-dimensional observation (27 pose/velocity terms plus 78 external
+contact-force terms), 8-dimensional continuous action (two joints per leg),
+episodes capped at 1000 steps. Pass `include_cfrc_ext_in_observation=False`
+to get the 27-dim version used by `Ant-v4`.
 
 We use Gymnasium's built-in quadruped rather than a Unitree model. Building a
 custom environment around a Unitree MJCF means writing and tuning an
@@ -44,6 +46,16 @@ Smoke test, should print the observation and action shapes:
 ```
 python -c "import gymnasium as gym; e=gym.make('Ant-v5'); print(e.observation_space.shape, e.action_space.shape)"
 ```
+
+### Measured throughput on this machine (CPU, 9 Nov)
+
+| Algorithm | Observed | 1M steps would take |
+|---|---|---|
+| PPO, 2 envs | ~1370 fps | ~12 min |
+| PPO, 8 envs | expect ~3000 fps | ~6 min |
+| SAC, 1 env | much slower, one gradient step per env step | hours, use Colab |
+
+So PPO and A2C can run locally. **SAC is the one that needs the GPU notebook.**
 
 PyTorch here is the **CPU** build on purpose. Local machines are for
 development; training happens on Colab GPUs (see `colab/train_colab.ipynb`).

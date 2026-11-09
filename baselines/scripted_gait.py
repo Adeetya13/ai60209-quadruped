@@ -69,10 +69,10 @@ def evaluate(p: dict, episodes: int, seed0: int = 0):
 
 def search(episodes: int = 3) -> dict:
     grid = {
-        "hip_amp": [0.3, 0.6, 0.9],
-        "ankle_amp": [0.3, 0.6, 0.9],
-        "freq": [0.8, 1.4, 2.0],
-        "ankle_lag": [0.0, 1.2, 2.4],
+        "hip_amp": [0.05, 0.15, 0.3, 0.6],
+        "ankle_amp": [0.05, 0.15, 0.3, 0.6],
+        "freq": [0.5, 1.0, 1.5, 2.5],
+        "ankle_lag": [0.0, 1.57, 3.14],
     }
     names = list(grid)
     best, best_score = None, -1e18

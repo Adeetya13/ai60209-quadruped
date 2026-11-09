@@ -1,0 +1,6 @@
+{
+  "hip_amp": 0.15,
+  "ankle_amp": 0.15,
+  "freq": 0.5,
+  "ankle_lag": 0.0
+}

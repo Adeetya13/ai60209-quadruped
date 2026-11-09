@@ -90,12 +90,14 @@ def main() -> None:
             y, x = bin_curve(df, args.bins, max_steps)
             curves.append(y)
         curves = np.vstack(curves)
-        mean, std = np.nanmean(curves, axis=0), np.nanstd(curves, axis=0)
+        mean = np.nanmean(curves, axis=0)
         color = COLORS.get(algo, None)
         ax.plot(x, mean, label=f"{algo.upper()}  (n={len(runs)} seeds)",
                 color=color, linewidth=2)
-        ax.fill_between(x, mean - std, mean + std, color=color, alpha=0.18,
-                        linewidth=0)
+        if len(runs) > 1:  # a band over one seed is zero-width and misleading
+            std = np.nanstd(curves, axis=0)
+            ax.fill_between(x, mean - std, mean + std, color=color, alpha=0.18,
+                            linewidth=0)
 
     ax.set_xlabel("environment steps")
     ax.set_ylabel("episode return")
