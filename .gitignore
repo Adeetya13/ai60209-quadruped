@@ -1,0 +1,10 @@
+rl_env/
+runs/
+figures/
+__pycache__/
+*.pyc
+*.mp4
+*.zip
+*.pkl
+*.pt
+.ipynb_checkpoints/
