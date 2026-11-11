@@ -10,11 +10,11 @@ Sample efficiency column: first environment step at which the 20-episode moving 
 
 | Policy | Seeds | Return | Fwd velocity (m/s) | Survival steps | Mean sq. action | Steps to return 1000 |
 |---|---|---|---|---|---|---|
-| PPO | 2 | 118.5 &plusmn; 78.3 | 0.829 &plusmn; 0.028 | 125 &plusmn; 90 | 0.133 &plusmn; 0.001 | never |
-| A2C | 3 | 1,187.2 &plusmn; 681.3 | 1.072 &plusmn; 0.457 | 687 &plusmn; 281 | 0.103 &plusmn; 0.018 | 582,507 |
-| REINFORCE (ours) | 2 | 982.8 &plusmn; 8.9 | 0.067 &plusmn; 0.084 | 958 &plusmn; 60 | 0.009 &plusmn; 0.002 | never |
-| Scripted trot | 1 | 1,174.7 | 0.222 | 1,000 | 0.011 | n/a |
-| Random policy | 1 | -58.3 | 0.040 | 189 | 0.335 | n/a |
+| PPO | 3 | 194.8 &plusmn; 108.9 | 0.857 &plusmn; 0.160 | 206 &plusmn; 118 | 0.132 &plusmn; 0.009 | never |
+| A2C | 3 | 1,201.7 &plusmn; 685.5 | 1.104 &plusmn; 0.483 | 691 &plusmn; 268 | 0.103 &plusmn; 0.016 | 582,507 |
+| REINFORCE (ours) | 2 | 962.3 &plusmn; 17.9 | 0.062 &plusmn; 0.079 | 945 &plusmn; 77 | 0.009 &plusmn; 0.002 | never |
+| Scripted trot | 1 | 1,186.1 | 0.233 | 1,000 | 0.011 | n/a |
+| Random policy | 1 | -66.3 | 0.084 | 214 | 0.334 | n/a |
 
 ## Variance-reduction ablation, our REINFORCE
 
@@ -22,8 +22,9 @@ The two steps Lecture 07 proves, measured rather than asserted.
 
 | Variant | Return | Fwd velocity (m/s) | Survival steps |
 |---|---|---|---|
-| reward-to-go + value baseline (full method) | 982.8 | 0.067 | 958 |
-| reward-to-go, no baseline | 959.2 | -0.001 | 1,000 |
+| reward-to-go + value baseline (full method) | 962.3 | 0.062 | 945 |
+| full return, no baseline | 980.0 | 0.016 | 1,000 |
+| reward-to-go, no baseline | 958.9 | -0.001 | 1,000 |
 
 ## Wall clock
 
@@ -34,3 +35,4 @@ The two steps Lecture 07 proves, measured rather than asserted.
 | a2c_s2 | 1,000,000 | 15.4 |
 | ppo_s0 | 1,000,000 | 84.9 |
 | ppo_s1 | 1,000,000 | 83.9 |
+| ppo_s2 | 1,000,000 | 21.7 |
