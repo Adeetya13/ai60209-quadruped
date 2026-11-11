@@ -118,19 +118,21 @@ def main() -> None:
     p.add_argument("--vf-lr", type=float, default=1e-3)
     p.add_argument("--returns", choices=["to-go", "full"], default="to-go")
     p.add_argument("--baseline", choices=["none", "mean", "value"], default="value")
+    p.add_argument("--env", default=ENV_ID)
     p.add_argument("--out", default="runs")
     args = p.parse_args()
 
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
 
-    tag = f"reinforce_s{args.seed}"
+    short = args.env.split("-")[0].lower()
+    tag = f"reinforce_s{args.seed}" if args.env == ENV_ID else f"reinforce-{short}_s{args.seed}"
     if args.returns != "to-go" or args.baseline != "value":
         tag += f"_{args.returns}_{args.baseline}"
     run_dir = Path(args.out) / tag
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    env = gym.make(ENV_ID)
+    env = gym.make(args.env)
     env.reset(seed=args.seed)
     env.action_space.seed(args.seed)
     obs_dim = env.observation_space.shape[0]
@@ -145,7 +147,7 @@ def main() -> None:
         v_opt = torch.optim.Adam(value_net.parameters(), lr=args.vf_lr)
 
     (run_dir / "config.json").write_text(json.dumps({
-        "env": ENV_ID, "algo": "reinforce", "seed": args.seed,
+        "env": args.env, "algo": "reinforce", "seed": args.seed,
         "total_timesteps": args.steps, "batch_steps": args.batch_steps,
         "gamma": args.gamma, "lr": args.lr, "returns": args.returns,
         "baseline": args.baseline, "implementation": "from scratch",

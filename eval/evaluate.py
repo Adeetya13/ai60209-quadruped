@@ -48,7 +48,8 @@ def sb3_policy(run_dir: Path):
     norm = None
     vec_path = run_dir / "vecnormalize.pkl"
     if vec_path.exists():
-        norm = VecNormalize.load(str(vec_path), DummyVecEnv([lambda: gym.make(ENV_ID)]))
+        env_id = cfg.get("env", ENV_ID)
+        norm = VecNormalize.load(str(vec_path), DummyVecEnv([lambda: gym.make(env_id)]))
         norm.training = False
 
     def act(obs, _step, _env):
@@ -87,20 +88,33 @@ def random_policy():
     return lambda _obs, _step, env: env.action_space.sample()
 
 
+def run_env_id(run_dir: Path) -> str:
+    """Evaluate a policy in the environment it was actually trained on."""
+    cfg = run_dir / "config.json"
+    if cfg.exists():
+        try:
+            return json.loads(cfg.read_text()).get("env", ENV_ID)
+        except Exception:
+            pass
+    return ENV_ID
+
+
 def resolve(run: str | None, policy: str | None):
+    """Returns (name, action function, env id)."""
     if policy == "random":
-        return "random", random_policy()
+        return "random", random_policy(), ENV_ID
     if policy == "scripted":
-        return "scripted_gait", scripted_policy()
+        return "scripted_gait", scripted_policy(), ENV_ID
     run_dir = Path(run)
+    env_id = run_env_id(run_dir)
     if (run_dir / "final_model.pt").exists():
-        return run_dir.name, reinforce_policy(run_dir)
-    return run_dir.name, sb3_policy(run_dir)
+        return run_dir.name, reinforce_policy(run_dir), env_id
+    return run_dir.name, sb3_policy(run_dir), env_id
 
 
 # ------------------------------------------------------------------ driver
-def measure(name, act_fn, episodes: int):
-    env = gym.make(ENV_ID)
+def measure(name, act_fn, episodes: int, env_id: str = ENV_ID):
+    env = gym.make(env_id)
     rows = [rollout(env, act_fn, 1000 + i) for i in range(episodes)]
     env.close()
     out = {"name": name, "episodes": episodes}
@@ -132,8 +146,8 @@ def main() -> None:
     results = []
     for run, policy in targets:
         try:
-            name, act_fn = resolve(run, policy)
-            results.append(measure(name, act_fn, args.episodes))
+            name, act_fn, env_id = resolve(run, policy)
+            results.append(measure(name, act_fn, args.episodes, env_id))
             print(f"[eval] {name:<28} return "
                   f"{results[-1]['return_mean']:9.1f} +/- {results[-1]['return_std']:7.1f}")
         except Exception as exc:

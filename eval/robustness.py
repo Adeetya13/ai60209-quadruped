@@ -99,7 +99,7 @@ def main() -> None:
     rows = []
     for run, policy in targets:
         try:
-            name, act_fn = resolve(run, policy)
+            name, act_fn, _env_id = resolve(run, policy)
             rows += run_sweep(name, act_fn, args.episodes)
         except Exception as exc:
             print(f"[robust] SKIPPED {run or policy}: {exc}")
