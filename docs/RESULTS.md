@@ -26,6 +26,19 @@ The two steps Lecture 07 proves, measured rather than asserted.
 | full return, no baseline | 980.0 | 0.016 | 1,000 |
 | reward-to-go, no baseline | 958.9 | -0.001 | 1,000 |
 
+## Robustness
+
+Mean return over the evaluation episodes, no retraining. Compare each row against its own unperturbed column.
+
+| Policy | unperturbed | mass x1.5 | mass x2 | gravity x1.25 | gravity x1.5 | noise x0.1 | noise x0.2 |
+|---|---|---|---|---|---|---|---|
+| PPO | 135 | 173 | 288 | 156 | 322 | 143 | 113 |
+| A2C | 1,170 | 1,535 | 1,499 | 1,169 | 1,525 | 810 | 604 |
+| REINFORCE (ours) | 994 | 986 | 974 | 976 | 993 | 913 | 678 |
+| Scripted trot | 1,249 | 1,066 | 1,021 | 988 | 894 | 833 | 800 |
+
+Read this with the main table. A policy whose unperturbed return is already near the random floor cannot show a meaningful drop, so only the A2C, REINFORCE and scripted rows support a robustness claim.
+
 ## Wall clock
 
 | Run | Steps | Minutes |

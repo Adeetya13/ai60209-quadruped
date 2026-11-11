@@ -169,19 +169,31 @@ def main() -> None:
         cols = [(k, lv) for k in ["mass", "gravity", "noise"]
                 for lv in sorted(rob[rob["perturbation"] == k]["level"].unique())
                 if lv != sorted(rob[rob["perturbation"] == k]["level"].unique())[0]]
+        # Absolute returns, not percentages. A retention ratio is meaningless
+        # when the unperturbed baseline is near the floor and dominated by
+        # variance: PPO's baseline is ~195 with a comparable s.d., which
+        # produced "retains 412%" in an earlier version of this table.
         lines += ["", "## Robustness", "",
-                  "Percentage of unperturbed return retained. No retraining.",
-                  "", "| Policy | " + " | ".join(f"{k} x{lv:g}" for k, lv in cols) + " |",
-                  "|---" * (len(cols) + 1) + "|"]
+                  "Mean return over the evaluation episodes, no retraining. "
+                  "Compare each row against its own unperturbed column.", "",
+                  "| Policy | unperturbed | "
+                  + " | ".join(f"{k} x{lv:g}" for k, lv in cols) + " |",
+                  "|---" * (len(cols) + 2) + "|"]
         for algo in ORDER:
             sub = rob[rob["algo"] == algo]
             if sub.empty:
                 continue
-            cells = []
+            base_rows = sub[(sub["perturbation"] == "mass") & (sub["level"] == 1.0)]
+            base = base_rows["return_mean"].mean() if len(base_rows) else float("nan")
+            cells = [f"{base:,.0f}" if base == base else ""]
             for k, lv in cols:
-                s = sub[(sub["perturbation"] == k) & (sub["level"] == lv)]
-                cells.append(f"{s['retained_pct'].mean():.0f}%" if len(s) else "")
+                r = sub[(sub["perturbation"] == k) & (sub["level"] == lv)]
+                cells.append(f"{r['return_mean'].mean():,.0f}" if len(r) else "")
             lines.append(f"| {PRETTY.get(algo, algo)} | " + " | ".join(cells) + " |")
+        lines += ["", "Read this with the main table. A policy whose unperturbed "
+                  "return is already near the random floor cannot show a "
+                  "meaningful drop, so only the A2C, REINFORCE and scripted rows "
+                  "support a robustness claim."]
 
     # ---- wall clock ------------------------------------------------------
     lines += ["", "## Wall clock", "", "| Run | Steps | Minutes |", "|---|---|---|"]
