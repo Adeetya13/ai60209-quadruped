@@ -17,6 +17,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+MAIN_ENV = "Ant-v5"
 THRESHOLD = 1000.0  # Ant return threshold used for the sample-efficiency column
 
 PRETTY = {
@@ -27,11 +28,25 @@ ORDER = ["ppo", "sac", "a2c", "reinforce", "scripted_gait", "random"]
 
 
 def parse_name(name: str):
-    """'ppo_s0' -> ('ppo', None).  'reinforce_s0_full_none' -> ('reinforce', 'full_none')."""
-    m = re.match(r"^([a-z0-9]+)_s(\d+)(?:_(.+))?$", name)
+    """'ppo_s0' -> ('ppo', None).  'reinforce_s0_full_none' -> ('reinforce', 'full_none').
+
+    Algorithm names may carry a hyphenated environment suffix, as in
+    'reinforce-halfcheetah_s1_to-go_none'.
+    """
+    m = re.match(r"^([a-z0-9-]+)_s(\d+)(?:_(.+))?$", name)
     if not m:
         return name, None
     return m.group(1), m.group(3)
+
+
+def run_config(runs_dir: str, name: str) -> dict:
+    cfg = Path(runs_dir) / name / "config.json"
+    if cfg.exists():
+        try:
+            return json.loads(cfg.read_text())
+        except Exception:
+            pass
+    return {}
 
 
 def fmt(mean, std=None, dp=1):
@@ -95,12 +110,25 @@ def main() -> None:
     metrics = pd.read_csv(mpath)
 
     # ---- group per-seed rows by algorithm -------------------------------
-    groups, ablations = defaultdict(list), defaultdict(list)
+    groups, ablations, abl_env = defaultdict(list), defaultdict(list), None
     for _, row in metrics.iterrows():
-        algo, variant = parse_name(str(row["name"]))
-        (ablations[variant] if variant else groups[algo]).append(row)
+        name = str(row["name"])
+        algo, variant = parse_name(name)
+        cfg = run_config(args.runs, name)
+        env = cfg.get("env", MAIN_ENV)
+        if env != MAIN_ENV:
+            # a different environment: returns are not comparable, so it only
+            # belongs in the ablation section
+            key = f"{cfg.get('returns', '?')}_{cfg.get('baseline', '?')}"
+            ablations[key].append(row)
+            abl_env = env
+            continue
         if variant:
-            ablations[variant][-1] = row
+            # an ablation variant run on the MAIN env. Superseded by the runs
+            # on the dedicated ablation environment, and mixing the two would
+            # average returns from different reward scales into one cell.
+            continue
+        groups[algo].append(row)
 
     eff = {}
     for run_dir in sorted(Path(args.runs).glob("*")):
@@ -141,25 +169,32 @@ def main() -> None:
 
     # ---- variance-reduction ablation ------------------------------------
     if ablations:
-        lines += ["", "## Variance-reduction ablation, our REINFORCE", "",
-                  "The two steps Lecture 07 proves, measured rather than asserted.",
-                  "", "| Variant | Return | Fwd velocity (m/s) | Survival steps |",
+        env_note = f" on `{abl_env}`" if abl_env else ""
+        lines += ["", f"## Variance-reduction ablation{env_note}", "",
+                  "Our own REINFORCE. The two steps Lecture 07 proves, measured "
+                  "rather than asserted. Returns are not comparable with the main "
+                  "table above when the environment differs.", "",
+                  "| Variant | Seeds | Return | Fwd velocity (m/s) |",
                   "|---|---|---|---|"]
-        label = {None: "reward-to-go + value baseline (full method)",
+        label = {"to-go_value": "reward-to-go + value baseline (full method)",
                  "to-go_none": "reward-to-go, no baseline",
+                 "full_value": "full return + value baseline",
                  "full_none": "full return, no baseline"}
-        base = groups.get("reinforce")
-        if base:
-            d = pd.DataFrame(base)
-            lines.append(f"| {label[None]} | {fmt(d['return_mean'].mean())} | "
-                         f"{fmt(d['x_velocity_mean'].mean(), None, 3)} | "
-                         f"{fmt(d['steps_mean'].mean(), None, 0)} |")
-        for variant, rows in sorted(ablations.items()):
-            r = rows[-1]
-            lines.append(f"| {label.get(variant, variant)} | "
-                         f"{fmt(r['return_mean'])} | "
-                         f"{fmt(r['x_velocity_mean'], None, 3)} | "
-                         f"{fmt(r['steps_mean'], None, 0)} |")
+        for key in ["to-go_value", "to-go_none", "full_value", "full_none"]:
+            rows = ablations.get(key)
+            if not rows:
+                continue
+            d = pd.DataFrame(rows); n = len(d)
+            lines.append(
+                f"| {label.get(key, key)} | {n} | "
+                f"{fmt(d['return_mean'].mean(), d['return_mean'].std() if n > 1 else None)} | "
+                f"{fmt(d['x_velocity_mean'].mean(), d['x_velocity_mean'].std() if n > 1 else None, 3)} |")
+        for key, rows in sorted(ablations.items()):
+            if key in label or not rows:
+                continue
+            d = pd.DataFrame(rows); n = len(d)
+            lines.append(f"| {key} | {n} | {fmt(d['return_mean'].mean())} | "
+                         f"{fmt(d['x_velocity_mean'].mean(), None, 3)} |")
 
     # ---- robustness ------------------------------------------------------
     rpath = Path(args.robustness)

@@ -14,17 +14,17 @@ Sample efficiency column: first environment step at which the 20-episode moving 
 | A2C | 3 | 1,201.7 &plusmn; 685.5 | 1.104 &plusmn; 0.483 | 691 &plusmn; 268 | 0.103 &plusmn; 0.016 | 582,507 |
 | REINFORCE (ours) | 2 | 962.3 &plusmn; 17.9 | 0.062 &plusmn; 0.079 | 945 &plusmn; 77 | 0.009 &plusmn; 0.002 | never |
 | Scripted trot | 1 | 1,186.1 | 0.233 | 1,000 | 0.011 | n/a |
-| Random policy | 1 | -66.3 | 0.084 | 214 | 0.334 | n/a |
+| Random policy | 1 | -58.4 | -0.066 | 161 | 0.337 | n/a |
 
-## Variance-reduction ablation, our REINFORCE
+## Variance-reduction ablation on `HalfCheetah-v5`
 
-The two steps Lecture 07 proves, measured rather than asserted.
+Our own REINFORCE. The two steps Lecture 07 proves, measured rather than asserted. Returns are not comparable with the main table above when the environment differs.
 
-| Variant | Return | Fwd velocity (m/s) | Survival steps |
+| Variant | Seeds | Return | Fwd velocity (m/s) |
 |---|---|---|---|
-| reward-to-go + value baseline (full method) | 962.3 | 0.062 | 945 |
-| full return, no baseline | 980.0 | 0.016 | 1,000 |
-| reward-to-go, no baseline | 958.9 | -0.001 | 1,000 |
+| reward-to-go + value baseline (full method) | 2 | 667.7 &plusmn; 63.4 | 0.718 &plusmn; 0.074 |
+| reward-to-go, no baseline | 2 | 423.2 &plusmn; 44.5 | 0.507 &plusmn; 0.091 |
+| full return, no baseline | 2 | -157.2 &plusmn; 195.0 | -0.118 &plusmn; 0.182 |
 
 ## Robustness
 

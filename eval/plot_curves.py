@@ -67,16 +67,24 @@ def main() -> None:
     ap.add_argument("--runs", default="runs")
     ap.add_argument("--out", default="figures/learning_curves.png")
     ap.add_argument("--bins", type=int, default=50)
+    ap.add_argument("--env", default="Ant-v5", help="only plot runs trained here")
     args = ap.parse_args()
 
     by_algo = defaultdict(list)
     for run_dir in sorted(Path(args.runs).glob("*")):
         if not run_dir.is_dir() or not (run_dir / "config.json").exists():
             continue
-        algo = json.loads((run_dir / "config.json").read_text()).get("algo")
+        cfg = json.loads((run_dir / "config.json").read_text())
+        algo = cfg.get("algo")
+        if cfg.get("env", "Ant-v5") != args.env:
+            continue
+        # on the ablation env every run is REINFORCE, so label by variant
+        key = algo
+        if algo == "reinforce" and args.env != "Ant-v5":
+            key = f"{cfg.get('returns', '?')}, baseline={cfg.get('baseline', '?')}"
         df = load_reinforce(run_dir) if algo == "reinforce" else load_sb3(run_dir)
         if df is not None and len(df) > 2:
-            by_algo[algo].append((run_dir.name, df))
+            by_algo[key].append((run_dir.name, df))
 
     if not by_algo:
         print("[plot] no runs with logged episodes yet")
@@ -92,7 +100,7 @@ def main() -> None:
         curves = np.vstack(curves)
         mean = np.nanmean(curves, axis=0)
         color = COLORS.get(algo, None)
-        ax.plot(x, mean, label=f"{algo.upper()}  (n={len(runs)} seeds)",
+        ax.plot(x, mean, label=f"{algo if ',' in algo else algo.upper()}  (n={len(runs)} seeds)",
                 color=color, linewidth=2)
         if len(runs) > 1:  # a band over one seed is zero-width and misleading
             std = np.nanstd(curves, axis=0)
