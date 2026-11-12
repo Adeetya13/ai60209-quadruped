@@ -18,9 +18,8 @@ algorithm written from scratch, and a tuned baseline to compare against.
 
 REPO
 
-  https://github.com/Adeetya13/ai60209-quadruped   (private, branch main)
+  https://github.com/Adeetya13/ai60209-quadruped   (public, branch main)
 
-Ask Adeetya to add your GitHub username as a collaborator before you clone.
 This file lives in the repo at docs/TEAM_PLAN.md and is kept current there,
 so pull before you rely on it.
 
@@ -55,14 +54,11 @@ WHO DOES WHAT
 
 
 PERSON 1 - SAC RUNS            deadline: Friday night
-Repo is up: https://github.com/Adeetya13/ai60209-quadruped (private).
-Ask Adeetya to add your GitHub username as a collaborator first.
+Repo is public, nothing to log into: https://github.com/Adeetya13/ai60209-quadruped
 
 1. Open colab/train_colab.ipynb in Google Colab
 2. Runtime > Change runtime type > T4 GPU
-3. Cell 5 already points at the repo. It will ask for a GitHub token:
-   make a fine-grained token at github.com/settings/tokens with read
-   access to this repo, and paste it when prompted
+3. Cell 5 already points at the repo, just run it
 4. Run the mount, install and clone cells
 5. In the training cell set ALGO = "sac", SEED = 0, run it
 6. Repeat for SEED = 1 and SEED = 2
@@ -138,8 +134,7 @@ slide, because questions do not go to the person who made it.
 
 
 ADEETYA
-- Repo pushed: https://github.com/Adeetya13/ai60209-quadruped (private, branch main)
-- Add every teammate as a collaborator on it
+- Repo pushed and public: https://github.com/Adeetya13/ai60209-quadruped
 - Add every teammate as a collaborator on the repo (they cannot clone until then)
 - Regenerate all tables once SAC lands
 - Integration: only one person merges to main, and that is me
