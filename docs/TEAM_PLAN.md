@@ -16,12 +16,21 @@ year on rigour: three seeds per algorithm with the spread reported, one
 algorithm written from scratch, and a tuned baseline to compare against.
 
 
+REPO
+
+  https://github.com/Adeetya13/ai60209-quadruped   (private, branch main)
+
+Ask Adeetya to add your GitHub username as a collaborator before you clone.
+This file lives in the repo at docs/TEAM_PLAN.md and is kept current there,
+so pull before you rely on it.
+
+
 WHAT IS ALREADY DONE
 
 - All 10 Ant runs trained and evaluated: PPO x3 seeds, A2C x3, REINFORCE x2,
   plus 2 ablation variants
 - Robustness sweep done: added mass, stronger gravity, action noise
-- Variance-reduction ablation rerunning on HalfCheetah right now
+- Variance-reduction ablation DONE on HalfCheetah: both steps matter and stack
 - All code written and verified end to end
 - Results in docs/RESULTS.md, figures in figures/
 
@@ -36,6 +45,10 @@ HEADLINE RESULTS (these go in the report)
 - PPO with default hyperparameters is unstable: falls after about 200 steps
 - A2C gets BETTER under added mass and gravity, because the extra weight
   keeps the robot upright longer
+- Ablation (HalfCheetah, 2 seeds each): reward-to-go + value baseline 668,
+  reward-to-go only 423, neither -157. Both variance-reduction steps matter
+  and they stack. The variant with neither does not learn at all, which is
+  exactly what Lecture 07 section 5.8 predicts
 
 
 WHO DOES WHAT
@@ -127,7 +140,7 @@ slide, because questions do not go to the person who made it.
 ADEETYA
 - Repo pushed: https://github.com/Adeetya13/ai60209-quadruped (private, branch main)
 - Add every teammate as a collaborator on it
-- Finish the HalfCheetah ablation (running now)
+- Add every teammate as a collaborator on the repo (they cannot clone until then)
 - Regenerate all tables once SAC lands
 - Integration: only one person merges to main, and that is me
 
