@@ -42,11 +42,14 @@ WHO DOES WHAT
 
 
 PERSON 1 - SAC RUNS            deadline: Friday night
-Blocked until Adeetya pushes the repo. Ping him if it is not up.
+Repo is up: https://github.com/Adeetya13/ai60209-quadruped (private).
+Ask Adeetya to add your GitHub username as a collaborator first.
 
 1. Open colab/train_colab.ipynb in Google Colab
 2. Runtime > Change runtime type > T4 GPU
-3. In cell 5, set REPO to our GitHub URL
+3. Cell 5 already points at the repo. It will ask for a GitHub token:
+   make a fine-grained token at github.com/settings/tokens with read
+   access to this repo, and paste it when prompted
 4. Run the mount, install and clone cells
 5. In the training cell set ALGO = "sac", SEED = 0, run it
 6. Repeat for SEED = 1 and SEED = 2
@@ -122,7 +125,8 @@ slide, because questions do not go to the person who made it.
 
 
 ADEETYA
-- Push the repo to GitHub TODAY. Person 1 is blocked until this happens
+- Repo pushed: https://github.com/Adeetya13/ai60209-quadruped (private, branch main)
+- Add every teammate as a collaborator on it
 - Finish the HalfCheetah ablation (running now)
 - Regenerate all tables once SAC lands
 - Integration: only one person merges to main, and that is me
@@ -145,7 +149,7 @@ Use a path with NO SPACES. Do not put it inside OneDrive: MuJoCo mishandles
 spaces and OneDrive will fight you over the thousands of files a training
 run produces.
 
-  git clone <repo URL> C:\dev\quadproj
+  git clone https://github.com/Adeetya13/ai60209-quadruped.git C:\dev\quadproj
   cd C:\dev\quadproj
   python -m venv rl_env
   rl_env\Scripts\activate
