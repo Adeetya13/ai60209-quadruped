@@ -225,10 +225,18 @@ def main() -> None:
                 r = sub[(sub["perturbation"] == k) & (sub["level"] == lv)]
                 cells.append(f"{r['return_mean'].mean():,.0f}" if len(r) else "")
             lines.append(f"| {PRETTY.get(algo, algo)} | " + " | ".join(cells) + " |")
+        strong = []
+        for algo in ORDER:
+            sub = rob[rob["algo"] == algo]
+            if sub.empty:
+                continue
+            b = sub[(sub["perturbation"] == "mass") & (sub["level"] == 1.0)]
+            if len(b) and b["return_mean"].mean() >= 500:
+                strong.append(PRETTY.get(algo, algo))
         lines += ["", "Read this with the main table. A policy whose unperturbed "
                   "return is already near the random floor cannot show a "
-                  "meaningful drop, so only the A2C, REINFORCE and scripted rows "
-                  "support a robustness claim."]
+                  "meaningful drop, so only these rows support a robustness "
+                  "claim: " + ", ".join(strong) + "."]
 
     # ---- wall clock ------------------------------------------------------
     lines += ["", "## Wall clock", "", "| Run | Steps | Minutes |", "|---|---|---|"]

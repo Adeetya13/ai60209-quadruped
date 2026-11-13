@@ -11,10 +11,11 @@ Sample efficiency column: first environment step at which the 20-episode moving 
 | Policy | Seeds | Return | Fwd velocity (m/s) | Survival steps | Mean sq. action | Steps to return 1000 |
 |---|---|---|---|---|---|---|
 | PPO | 3 | 194.8 &plusmn; 108.9 | 0.857 &plusmn; 0.160 | 206 &plusmn; 118 | 0.132 &plusmn; 0.009 | never |
+| SAC | 3 | 1,411.2 &plusmn; 184.8 | 2.309 &plusmn; 0.286 | 652 &plusmn; 38 | 0.282 &plusmn; 0.031 | 401,994 |
 | A2C | 3 | 1,201.7 &plusmn; 685.5 | 1.104 &plusmn; 0.483 | 691 &plusmn; 268 | 0.103 &plusmn; 0.016 | 582,507 |
 | REINFORCE (ours) | 2 | 962.3 &plusmn; 17.9 | 0.062 &plusmn; 0.079 | 945 &plusmn; 77 | 0.009 &plusmn; 0.002 | never |
 | Scripted trot | 1 | 1,186.1 | 0.233 | 1,000 | 0.011 | n/a |
-| Random policy | 1 | -58.4 | -0.066 | 161 | 0.337 | n/a |
+| Random policy | 1 | -69.4 | 0.064 | 216 | 0.339 | n/a |
 
 ## Variance-reduction ablation on `HalfCheetah-v5`
 
@@ -33,11 +34,12 @@ Mean return over the evaluation episodes, no retraining. Compare each row agains
 | Policy | unperturbed | mass x1.5 | mass x2 | gravity x1.25 | gravity x1.5 | noise x0.1 | noise x0.2 |
 |---|---|---|---|---|---|---|---|
 | PPO | 135 | 173 | 288 | 156 | 322 | 143 | 113 |
+| SAC | 1,700 | 1,439 | 1,424 | 2,205 | 2,163 | 1,499 | 922 |
 | A2C | 1,170 | 1,535 | 1,499 | 1,169 | 1,525 | 810 | 604 |
 | REINFORCE (ours) | 994 | 986 | 974 | 976 | 993 | 913 | 678 |
 | Scripted trot | 1,249 | 1,066 | 1,021 | 988 | 894 | 833 | 800 |
 
-Read this with the main table. A policy whose unperturbed return is already near the random floor cannot show a meaningful drop, so only the A2C, REINFORCE and scripted rows support a robustness claim.
+Read this with the main table. A policy whose unperturbed return is already near the random floor cannot show a meaningful drop, so only these rows support a robustness claim: SAC, A2C, REINFORCE (ours), Scripted trot.
 
 ## Wall clock
 
@@ -49,3 +51,6 @@ Read this with the main table. A policy whose unperturbed return is already near
 | ppo_s0 | 1,000,000 | 84.9 |
 | ppo_s1 | 1,000,000 | 83.9 |
 | ppo_s2 | 1,000,000 | 21.7 |
+| sac_s0 | 500,000 | 126.3 |
+| sac_s1 | 500,000 | 123.9 |
+| sac_s2 | 500,000 | 122.1 |
