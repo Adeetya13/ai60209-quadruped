@@ -18,8 +18,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from evaluate import ENV_ID, resolve  # noqa: E402
 
 
-def record(act_fn, out_path: Path, seconds: float = 10.0, seed: int = 0):
-    env = gym.make(ENV_ID, render_mode="rgb_array")
+def record(act_fn, out_path: Path, seconds: float = 10.0, seed: int = 0,
+           env_id: str = ENV_ID):
+    env = gym.make(env_id, render_mode="rgb_array")
     obs, _ = env.reset(seed=seed)
     fps = int(round(1.0 / env.unwrapped.dt))
     frames, step = [], 0
@@ -63,8 +64,9 @@ def main() -> None:
             )
         return
 
-    name, act_fn = resolve(args.run, args.policy)
-    record(act_fn, Path(args.outdir) / f"{name}.mp4", seconds=args.seconds)
+    name, act_fn, env_id = resolve(args.run, args.policy)
+    record(act_fn, Path(args.outdir) / f"{name}.mp4", seconds=args.seconds,
+           env_id=env_id)
 
 
 if __name__ == "__main__":
